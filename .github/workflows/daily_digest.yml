@@ -1,0 +1,30 @@
+name: Veille Kiné Quotidienne
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Tous les matins à 7h (heure de Paris = UTC+1)
+  workflow_dispatch:      # Permet aussi de lancer manuellement depuis GitHub
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installation des dépendances
+        run: pip install requests
+
+      - name: Lancement de l'agent
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: python agent.py
