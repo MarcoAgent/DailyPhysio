@@ -80,13 +80,22 @@ Réponds directement sans introduction."""
             "Content-Type": "application/json",
         },
         json={
-            "model": "llama3-70b-8192",
+            "model": "llama-3.3-70b-versatile",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.3,
             "max_tokens": 500,
         },
     )
-    return response.json()["choices"][0]["message"]["content"]
+
+    data = response.json()
+
+    # Affiche la réponse complète si erreur
+    if "choices" not in data:
+        error_msg = data.get("error", {}).get("message", str(data))
+        print(f"⚠️ Erreur Groq pour '{topic}': {error_msg}")
+        return f"Erreur lors de la synthèse : {error_msg}"
+
+    return data["choices"][0]["message"]["content"]
 
 # ============================================================
 # ÉTAPE 3 — Construire et envoyer l'email HTML
